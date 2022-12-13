@@ -19,7 +19,7 @@ tasks:
       cd paho.mqtt.python
       python setup.py install
       cd ..
-    command: streamlit run pagina.py
+    command: streamlit run site.py
 # List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
 ports:
   # default port?

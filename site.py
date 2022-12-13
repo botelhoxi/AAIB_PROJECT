@@ -15,13 +15,8 @@ import librosa as lib
 import librosa.display
 import time
 
-st.title('Cloud Logger - AAIB 2022')
-
-with st.sidebar:
-    add_radio = st.radio(
-        "Tabela de conteudos",
-        ("Introdução", "Iniciar aquisição")
-    )
+st.title('AAIB PROJECT 2022')
+st.subheader('Project that provides a translation from spoken words to sign language')
 
 st_autorefresh(interval=5000)  
 
@@ -32,12 +27,13 @@ def MQTT_TH(client):
  
     # The callback for when a PUBLISH message is received from the server.
     def on_message(client, userdata, msg):
-        print("Recebi")
         str = msg.payload.decode()
-        print(type(str))
-        print(str) 
+        st.session_state['word'] = str
+        st.session_state['recording'] = False
     
     #client = mqtt.Client()
+    st.session_state['word'] = ""
+    st.session_state['recording'] = False
     client.on_connect = on_connect
     client.on_message = on_message
     client.connect("mqtt.eclipseprojects.io", 1883, 60)
@@ -49,28 +45,31 @@ if 'mqttThread' not in st.session_state:
     add_script_run_ctx(st.session_state.mqttThread)
     st.session_state.mqttThread.start()
 
-# Botão
-if add_radio == 'Iniciar aquisição':
+# Start Acquisition
+if st.button('Record Audio :microphone:'):
     st.session_state.mqttClient.publish("aaibproject/request", payload="start")
-    print("Enviei")
+    st.session_state['recording'] = True
 
-else:
-    st.graphviz_chart('''
-        digraph {
-            subgraph {
-                microfone -> computador
-            computador -> mqtt_dados [color=blue, style=dotted, shape=box]
-            mqtt_dados -> gitpod [color=blue, style=dotted]
-            mqtt_pedido -> computador [color=blue, style=dotted]
-            gitpod -> mqtt_pedido [color=blue, style=dotted]        
-            mqtt_pedido  [shape=box]
-            mqtt_dados  [shape=box]
-            rank = same; mqtt_pedido; mqtt_dados;
-            }
-        }
-    ''')
-    st.caption('O diagrama acima é uma generalização do funcionamento da aplicação feito com recurso ao graphviz')
-    st.text('Esta página web é o resultado do projeto "Cloud Logger de instrumentação"\nrealizado na cadeira de Aplicações Avançadas em Instrumentação Biomédica.')
-    st.text('Esta página web tem duas opções apresentadas na barra lateral à esquerda.\nA primeira, na qual se encontra neste momento, contém uma rápida introdução\ne explicação do funcionamento da aplicação.')
-    st.subheader('Introdução')
-    st.text('Esta página web configurada no gitpod comunica com um computador pessoal através do\nprotocolo de comunição MQTT.\nQuando selecionada a opção "Iniciar aquisição" da barra lateral é enviado pela Cloud\num pedido de gravação de dados ao computador local que utiliza o microfone embebido\npara gravar um ficheiro .wav.\nNa mesma máquina em que é gravado o ficheiro de som, são também calculadas\ncaracterísticas do som que são então enviadas pela CLoud para serem apresentadas\nnesta página web.\nEnquanto a opção de aquisição está selecionada a comunicação é feita continua\ne sequencialmente, havendo um pedido de gravação a cada 5 segundos seguido do\nenvio e atualização dos gráficos na página web\nHá também a possibilidade de guardar os dados mostrados em gráfico num ficheiro .csv\nonde são guardados todos os instantes desde o inicio da aquisição.')
+if st.session_state['recording']:
+    with st.spinner('Recording Audio...'):
+        time.sleep(4)
+    st.success('Done!')
+
+if st.session_state['word'] == "Computador" and not st.session_state['recording']:
+    video_file = open('computador.mp4', 'rb')
+    video_bytes = video_file.read()
+    st.video(video_bytes)
+    st.subheader('Word: Computador')
+
+if st.session_state['word'] == "Engenharia" and not st.session_state['recording']:
+    video_file = open('engenharia.mp4', 'rb')
+    video_bytes = video_file.read()
+    st.video(video_bytes)
+    st.write('Last Word: Engenharia')
+
+
+if st.session_state['word'] == "Sinal" and not st.session_state['recording']:
+    video_file = open('sinal.mp4', 'rb')
+    video_bytes = video_file.read()
+    st.video(video_bytes)
+    st.subheader('Word: Sinal')
