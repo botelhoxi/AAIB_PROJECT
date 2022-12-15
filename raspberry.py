@@ -8,17 +8,20 @@ import pandas as pd
 from sklearn.svm import SVC
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
+import time
+import socket
+import struct
 
 fs = 44100 #sampling frequency, will be a parameter in the function responsible for recording the audio
 second = 4 #defines the duration of the recorded audio
 
 #MQTT Thread Function
 
-def get_data():
+def get_class(wavfile):
     #record_voice = sd.rec( int( second * fs ) , samplerate = fs , channels = 2 )
     #sd.wait() # wait for the recording of the audio to continue with the script
     #write("som.wav", fs , record_voice )
-    y, sr = lib.load("som.wav") 
+    y, sr = lib.load(wavfile) 
     # EXTRAIR AS FEATURES
     mfcc=lib.feature.mfcc(y=y,sr=sr)
     mf6 = np.mean(mfcc[5])
@@ -50,11 +53,12 @@ def MQTT_TH(client):
  
     # The callback for when a PUBLISH message is received from the server.
     def on_message(client, userdata, msg):
-        print(msg.topic+" "+str(msg.payload))   # when the message is "start" it means that came from "inesbotelho/request" and is needed to send the data
-        classe = get_data() # get the data from the function
+        print(msg.topic+" "+str(msg.payload))   
+        wavfile = get_data()
+        class = get_class(wavfile) # get the data from the function
         #print(classe)
         print("Publiquei")
-        client.publish("aaibproject/data", classe)
+        client.publish("aaibproject/data", class)
 
     print('Incializing MQTT')
     client.on_connect = on_connect
