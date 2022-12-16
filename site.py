@@ -34,6 +34,7 @@ def MQTT_TH(client):
     #client = mqtt.Client()
     st.session_state['word'] = ""
     st.session_state['recording'] = False
+    st.session_state['waiting'] = True
     client.on_connect = on_connect
     client.on_message = on_message
     client.connect("mqtt.eclipseprojects.io", 1883, 60)
@@ -49,11 +50,19 @@ if 'mqttThread' not in st.session_state:
 if st.button('Record Audio :microphone:'):
     st.session_state.mqttClient.publish("aaibproject/request", payload="start")
     st.session_state['recording'] = True
+    st.session_state['waiting'] = True
 
-if st.session_state['recording']:
+if st.session_state['recording'] and st.session_state['waiting']:
+    st.session_state['waiting'] = False
     with st.spinner('Recording Audio...'):
-        time.sleep(4)
-    st.success('Done!')
+        time.sleep(5)
+
+if st.session_state['recording'] and not st.session_state['waiting']:    
+    st.info('Done Recording! Waiting for classification')
+
+if st.session_state['word'] != "" and not st.session_state['recording']:
+    st.success("Done!")
+    time.sleep(2)
 
 if st.session_state['word'] == "Computador" and not st.session_state['recording']:
     video_file = open('computador.mp4', 'rb')
@@ -65,8 +74,7 @@ if st.session_state['word'] == "Engenharia" and not st.session_state['recording'
     video_file = open('engenharia.mp4', 'rb')
     video_bytes = video_file.read()
     st.video(video_bytes)
-    st.write('Last Word: Engenharia')
-
+    st.subheader('Word: Engenharia')
 
 if st.session_state['word'] == "Sinal" and not st.session_state['recording']:
     video_file = open('sinal.mp4', 'rb')
