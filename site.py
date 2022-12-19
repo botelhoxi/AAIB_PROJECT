@@ -1,18 +1,10 @@
-import csv
+
 import streamlit as st
-import pandas as pd
 import json
-import numpy as np
-import matplotlib.pyplot as plt
-import streamlit as st
 import paho.mqtt.client as mqtt
 import threading as th
 from streamlit.runtime.scriptrunner.script_run_context import add_script_run_ctx
 from streamlit_autorefresh import st_autorefresh
-from csv import writer
-import plotly.express as px
-import librosa as lib
-import librosa.display
 import time
 
 st.title('AAIB PROJECT 2022')
