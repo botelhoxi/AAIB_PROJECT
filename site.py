@@ -49,9 +49,9 @@ if st.session_state['msg']=="done":
     st.success('Done Recording!')
     st.info("Waiting for classification...")
 
-if st.session_state['msg'] == "result" :
-    st.success("Result received!")
-    time.sleep(2)
+#if st.session_state['msg'] == "result" :
+#    st.success("Result received!")
+#    time.sleep(2)
 
 if st.session_state['msg'] == "Computador":
     video_file = open('computador.mp4', 'rb')
@@ -70,3 +70,9 @@ if st.session_state['msg'] == "Sinal":
     video_bytes = video_file.read()
     st.video(video_bytes)
     st.subheader('Word: Sinal')
+
+if st.session_state['msg'] == "Não":    
+    st.subheader('Classe de rejeição')
+
+if st.session_state['msg'] == "novo":    
+    st.subheader('Erro na gravação, grave de novo')
