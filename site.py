@@ -21,6 +21,7 @@ def MQTT_TH(client):
     def on_message(client, userdata, msg):
         str = msg.payload.decode()
         st.session_state['msg'] = str
+        print(str)
     
     #client = mqtt.Client()
     st.session_state['msg'] = ""
@@ -35,19 +36,24 @@ if 'mqttThread' not in st.session_state:
     add_script_run_ctx(st.session_state.mqttThread)
     st.session_state.mqttThread.start()
 
+ip = st.text_input('Movie title')
+
 # Start Acquisition
 if st.button('Record Audio :microphone:'):
-    st.session_state.mqttClient.publish("aaibproject/request", payload="start")
+    st.session_state.mqttClient.publish("aaibproject/request", payload=ip)
+    st.session_state['msg']="recording"
 
-if st.button('Stop Recording :octagonal_sign:'):
-    st.session_state.mqttClient.publish("aaibproject/request", payload="stop")
+#if st.button('Stop Recording :octagonal_sign:'):
+#    st.session_state.mqttClient.publish("aaibproject/request", payload="stop")
 
 if st.session_state['msg']=="recording":
-    st.info('Recording Audio...')
+    with st.spinner('Recording Audio...'):
+        st.info("When the audio is recorded it will wait for the classification")
+        time.sleep(5)
+    st.session_state['msg']=""
 
-if st.session_state['msg']=="done":    
-    st.success('Done Recording!')
-    st.info("Waiting for classification...")
+if st.session_state['msg'] == "error":    
+    st.error('Recording error, try again')
 
 #if st.session_state['msg'] == "result" :
 #    st.success("Result received!")
@@ -73,6 +79,3 @@ if st.session_state['msg'] == "Sinal":
 
 if st.session_state['msg'] == "Não":    
     st.subheader('Classe de rejeição')
-
-if st.session_state['msg'] == "novo":    
-    st.subheader('Erro na gravação, grave de novo')
