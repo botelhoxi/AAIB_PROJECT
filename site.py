@@ -27,7 +27,7 @@ def MQTT_TH(client):
     st.session_state['msg'] = "" #inicializar variável que vai receber as mensagens pelo mqtt
     client.on_connect = on_connect
     client.on_message = on_message
-    client.connect("mqtt.eclipseprojects.io", 1883, 60)
+    client.connect("192.168.1.98", 1883, 60)
     client.loop_forever()
 
 if 'mqttThread' not in st.session_state:
