@@ -84,7 +84,7 @@ def get_data(client, host):
           
         #print('socket closed') 
         
-def extract_word():
+def extract_word(client):
     debug=True
     # Read the audio file and remove the first 0.5 seconds of signal corresponding to metadata
     data_path = 'som.wav'
@@ -132,7 +132,8 @@ def extract_word():
                 plt.plot(t2, arr[start_index:end_index])
 
     #fig.savefig('audiofile.pdf')
-    return arr[start_index:end_index], sr
+    get_class(arr[start_index:end_index] , sr, client)
+    print("extração")
 
 def get_class(som, sr, client):
     client.publish("aaibproject/data", "done")
@@ -154,7 +155,8 @@ def get_class(som, sr, client):
     elif(prediction == 2): classe = "Engenharia"
     elif(prediction == 3): classe = "Sinal"
     else: classe = "Não"
-    return classe
+    print(classe)
+    client.publish("aaibproject/data", classe) 
 
 def MQTT_TH(client):    
     def on_connect(client, userdata, flags, rc):
@@ -171,10 +173,10 @@ def MQTT_TH(client):
         global gravar
         if(msg == "stop"):
             gravar = False
-            som, sr = extract_word()
-            classe = get_class(som, sr, client) #get the class from the audio acquired
-            print(classe)
-            client.publish("aaibproject/data", classe) 
+            extract_word(client)
+            #classe = get_class(som, sr, client) #get the class from the audio acquired
+            #print(classe)
+            #client.publish("aaibproject/data", classe) 
         else:            
             gravar = True
             #get_data(client, msg)
