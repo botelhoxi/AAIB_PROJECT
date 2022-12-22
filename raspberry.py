@@ -106,13 +106,15 @@ def extract_word(debug=False):
 def get_class(som):
     # Extrair features
     mfcc=lib.feature.mfcc(y=som,sr=samplerate)
-    mf2 = np.mean(mfcc[1])
-    mf4 = np.mean(mfcc[3])
-    sample = np.array([mf2, mf4])
+    mf5 = np.mean(mfcc[4])
+    zero_crossings = sum(lib.zero_crossings(som, pad=False))
+    mf9 = np.mean(mfcc[8])
+    mf14 = np.mean(mfcc[13])
+    sample = np.array([mf5, zero_crossings, mf9, mf14])
     # Criar o classificador
     data = pd.read_excel('data.xlsx')
     modelo = SVC(kernel='linear') 
-    modelo.fit(data[['mf2', 'mf4']], data['classe'])
+    modelo.fit(data[['mf5', 'zero_crossings', 'mf9', 'mf14']], data['classe'])
     # Fazer a prediction
     prediction = modelo.predict(sample.reshape(1, -1))
     if(prediction == 1): classe = "Computador"
